@@ -1,0 +1,54 @@
+name: check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      PYTHONIOENCODING: utf8
+      K: skills/suup-jejak
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 성취기준 찾기
+        run: node "$K/scripts/standards.mjs" get 9과15-01
+      - name: 견본으로 지도안·활동지 만들고 구조 점검
+        run: |
+          for d in "$K"/examples/*/; do
+            out="$RUNNER_TEMP/$(basename "$d")"
+            mkdir -p "$out"
+            python "$K/scripts/check_design.py" "$d/design.json"
+            python "$K/scripts/make_plan.py"  "$d/design.json" -o "$out/지도안.hwpx"
+            python "$K/scripts/make_sheet.py" "$d/design.json" -o "$out/활동지.hwpx"
+            python "$K/scripts/validate_hwpx.py" "$out/지도안.hwpx" "$out/활동지.hwpx"
+          done
+      - name: 저장소의 견본 파일과 같은지 확인
+        run: |
+          python - <<'PY'
+          import os, zipfile, glob, sys
+          bad = 0
+          for d in glob.glob(os.environ['K'] + '/examples/*/'):
+              name = os.path.basename(os.path.normpath(d))
+              for f in ('지도안.hwpx', '활동지.hwpx'):
+                  a = zipfile.ZipFile(os.path.join(d, f)); b = zipfile.ZipFile(os.path.join(os.environ['RUNNER_TEMP'], name, f))
+                  for n in a.namelist():
+                      if a.read(n) != b.read(n):
+                          print('다름:', name, f, n); bad = 1
+          sys.exit(bad)
+          PY
