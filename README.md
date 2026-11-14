@@ -24,7 +24,7 @@
 | Codex CLI 0.167 (Windows) | 됨 | 됨 | 통과 | 안 됨: 샌드박스가 한글 자동화를 막음 |
 | Antigravity CLI 1.4.9 (Windows) | 됨 | 됨 | 통과 | 됨 |
 | Claude Code (Windows) | 됨 | 됨 | 통과 | 됨 |
-| Linux·macOS | - | 확인 예정 (GitHub Actions) | 확인 예정 | 해당 없음 |
+| Linux·macOS·Windows (GitHub Actions) | - | 됨 | 통과 (견본과 바이트 단위로 같음) | 해당 없음 |
 
 - **hwpx 만들기는 한글 프로그램 없이** Python 표준 기능만으로 합니다. 그래서 운영체제와 AI 환경에 관계없이 동작하고, 만들 때 한글의 허용 확인 창도 뜨지 않습니다.
 - **PDF 확인**은 AI가 결과를 눈으로 검토하는 선택 단계로, Windows와 한컴오피스가 있어야 합니다. 할 수 없는 환경에서는 건너뛰고 구조 점검 결과만 알려 줍니다. 이때는 한글에서 직접 열어 보세요.
