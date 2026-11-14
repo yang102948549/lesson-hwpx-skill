@@ -18,6 +18,9 @@ DLL은 pyhwpx 패키지에 들어 있는 것을 씁니다 (pip install pyhwpx).
 import importlib.util
 import sys
 from pathlib import Path
+for _s in (sys.stdout, sys.stderr):  # 콘솔 인코딩에 없는 글자 때문에 멈추지 않도록
+    if hasattr(_s, 'reconfigure'):
+        _s.reconfigure(errors='replace')
 
 KEY = r'Software\HNC\HwpAutomation\Modules'
 NAME = 'FilePathCheckerModule'

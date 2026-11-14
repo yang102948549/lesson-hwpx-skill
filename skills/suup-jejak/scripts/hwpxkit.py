@@ -6,9 +6,13 @@ ElementTree로 다시 쓰면 네임스페이스 접두사가 바뀌어 한글이
 XML은 문자열로만 다룹니다.
 """
 import re
+import sys
 import zipfile
 from pathlib import Path
 from xml.sax.saxutils import escape
+for _s in (sys.stdout, sys.stderr):  # 콘솔 인코딩에 없는 글자 때문에 멈추지 않도록
+    if hasattr(_s, 'reconfigure'):
+        _s.reconfigure(errors='replace')
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / 'templates' / '지도안 서식.hwpx'

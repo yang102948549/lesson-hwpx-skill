@@ -10,6 +10,9 @@ validate_hwpx.py로 점검한 뒤, 사용자에게 한글에서 열어 확인해
 """
 import sys
 from pathlib import Path
+for _s in (sys.stdout, sys.stderr):  # 콘솔 인코딩에 없는 글자 때문에 멈추지 않도록
+    if hasattr(_s, 'reconfigure'):
+        _s.reconfigure(errors='replace')
 
 SKIP = 2   # 이 환경에서는 PDF 확인을 할 수 없음 (오류가 아니라 건너뜀)
 
