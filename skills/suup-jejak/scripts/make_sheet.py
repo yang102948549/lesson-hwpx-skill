@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from hwpxkit import CHAR, PARA, Package, cell, para, plain_text, table  # noqa: E402
+from hwpxkit import CHAR, PARA, Package, cell, esc, para, plain_text, table  # noqa: E402
 from check_design import check  # noqa: E402
 
 W = 49594            # 표 너비 (지도안 표와 같음)
@@ -49,7 +49,7 @@ class Styles:
 
 def widths(ratios, total=W):
     s = sum(ratios)
-    ws = [total * r // s for r in ratios]
+    ws = [int(total * r // s) for r in ratios]   # 비율이 실수여도 너비는 정수로
     ws[-1] += total - sum(ws)
     return ws
 
@@ -162,7 +162,7 @@ def build(design_path, out=None):
     ws = d['worksheet']
     pkg = Package()
     st = Styles(pkg)
-    title_runs = f'<hp:run charPrIDRef="{st.title}"><hp:t>{ws["title"]}</hp:t></hp:run>'
+    title_runs = f'<hp:run charPrIDRef="{st.title}"><hp:t>{esc(ws["title"])}</hp:t></hp:run>'
     paras = [pkg.first_para(title_runs), head_table(st, d)]
     qnum = [0]
     for sec in ws['sections']:

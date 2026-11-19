@@ -6,7 +6,7 @@ description: 2022 개정 교육과정 성취기준 코드(예 9과15-01)나 단�
 # 수업 제작: 지도안과 활동지 (hwpx)
 
 > **이 스킬을 설치하는 중이라면** (Windows): 폴더를 다 복사한 뒤 설치의 마지막 단계로
-> `python <설치한 스킬 폴더>/scripts/setup_hwp_security.py --apply`를 실행하고, 출력 결과를 사용자에게 알린다.
+> `powershell -NoProfile -ExecutionPolicy Bypass -File "<설치한 스킬 폴더>/scripts/suup.ps1" security --apply`를 실행하고, 출력 결과를 사용자에게 알린다.
 > 한글 보안 모듈을 등록해 한글 자동화가 파일을 열 때 '접근 허용' 확인 창이 뜨지 않게 한다.
 > 이 PC의 다른 한글 자동화 프로그램에도 적용되며 `--remove`로 지울 수 있다는 점도 함께 알린다.
 > Windows가 아니면 건너뛴다.
@@ -21,20 +21,34 @@ description: 2022 개정 교육과정 성취기준 코드(예 9과15-01)나 단�
 ## 1. 명령
 
 `<SKILL>`은 이 SKILL.md가 있는 폴더다. 결과물은 사용자의 작업 폴더에 차시마다 폴더를 하나 만들어 둔다(스킬 폴더 안에 두지 않는다).
+같은 일을 하는 도구가 두 벌 있다. 결과 파일은 같다. **실행 환경을 보고 하나를 고른다.**
+
+**Windows (기본)**: Windows에 들어 있는 PowerShell만 쓴다. Python·Node.js가 없어도 된다. bash에서도 PowerShell에서도 그대로 실행한다.
 
 ```
-node   <SKILL>/scripts/standards.mjs context 9과15-01          # 성취기준 원문, 평가 증거, 오개념, 선후 학습
-python <SKILL>/scripts/check_design.py  <차시폴더>/design.json  # 지도안·활동지 연결과 시간 점검
-python <SKILL>/scripts/make_plan.py     <차시폴더>/design.json  # → <차시폴더>/지도안.hwpx
-python <SKILL>/scripts/make_sheet.py    <차시폴더>/design.json  # → <차시폴더>/활동지.hwpx
-python <SKILL>/scripts/validate_hwpx.py <차시폴더>/*.hwpx       # 파일 구조 점검 (모든 운영체제)
-python <SKILL>/scripts/render_pdf.py    <차시폴더>/*.hwpx       # 한글로 열어 PDF 저장 (Windows + 한컴오피스만)
+powershell -NoProfile -ExecutionPolicy Bypass -File "<SKILL>/scripts/suup.ps1" standards context 9과15-01   # 성취기준 원문, 평가 증거, 오개념, 선후 학습
+powershell -NoProfile -ExecutionPolicy Bypass -File "<SKILL>/scripts/suup.ps1" check    "<차시폴더>/design.json"  # 지도안·활동지 연결과 시간 점검
+powershell -NoProfile -ExecutionPolicy Bypass -File "<SKILL>/scripts/suup.ps1" plan     "<차시폴더>/design.json"  # → <차시폴더>/지도안.hwpx
+powershell -NoProfile -ExecutionPolicy Bypass -File "<SKILL>/scripts/suup.ps1" sheet    "<차시폴더>/design.json"  # → <차시폴더>/활동지.hwpx
+powershell -NoProfile -ExecutionPolicy Bypass -File "<SKILL>/scripts/suup.ps1" validate "<차시폴더>/지도안.hwpx" "<차시폴더>/활동지.hwpx"  # 파일 구조 점검
+powershell -NoProfile -ExecutionPolicy Bypass -File "<SKILL>/scripts/suup.ps1" pdf      "<차시폴더>/지도안.hwpx" "<차시폴더>/활동지.hwpx"  # 한글로 열어 PDF 저장 (한컴오피스 필요)
 ```
 
-- Windows에서 한글 출력이 깨지면 명령 앞에 환경 변수 `PYTHONIOENCODING=utf8`을 둔다.
-- 필요한 것: Python 3.8 이상(표준 라이브러리만 씀), Node 18 이상. `render_pdf.py`만 Windows, 한컴오피스, pywin32가 필요하다.
-- `render_pdf.py`를 쓸 수 없으면(Windows가 아님, 한컴오피스 없음, 보안 모듈 미등록, 샌드박스가 한글 자동화를 막음 → "PDF 확인 건너뜀", 종료 코드 2) `validate_hwpx.py`로 점검하고, 사용자에게 한글에서 열어 확인해 달라고 말한다. 한 번 건너뜀이 나오면 다시 시도하지 않는다.
-- **한글 보안 모듈**: 스킬을 설치할 때 `setup_hwp_security.py --apply`로 등록한다(맨 위 안내). 등록돼 있지 않으면 한글이 파일을 열 때마다 '접근 허용' 확인 창을 띄우므로 `render_pdf.py`는 건너뛴다. 수업을 만드는 도중에는 스스로 등록하지 말고, 설치 단계가 빠졌다고 사용자에게 알린 뒤 원하면 실행한다. 상태는 `python <SKILL>/scripts/setup_hwp_security.py`로 본다.
+**macOS·Linux·클라우드 샌드박스** (PowerShell이 없고 Python·Node가 있는 곳):
+
+```
+node   <SKILL>/scripts/standards.mjs context 9과15-01
+python <SKILL>/scripts/check_design.py  <차시폴더>/design.json
+python <SKILL>/scripts/make_plan.py     <차시폴더>/design.json
+python <SKILL>/scripts/make_sheet.py    <차시폴더>/design.json
+python <SKILL>/scripts/validate_hwpx.py <차시폴더>/*.hwpx
+```
+
+- `standards`는 `browse`, `search`, `get`, `context`를 받는다(`--school 중 --grades 1 --subject 과학 --limit 20`, `--json`). 두 벌 모두 같다.
+- `plan`, `sheet`는 `-o <파일>`로 저장 위치를 바꿀 수 있다.
+- Windows에서 Python 쪽을 쓸 때 한글 출력이 깨지면 명령 앞에 환경 변수 `PYTHONIOENCODING=utf8`을 둔다.
+- PDF 확인(`pdf`)을 할 수 없으면(Windows가 아님, 한컴오피스 없음, 보안 모듈 미등록, 샌드박스가 한글 자동화를 막음 → "PDF 확인 건너뜀", 종료 코드 2) `validate`로 점검하고, 사용자에게 한글에서 열어 확인해 달라고 말한다. 한 번 건너뜀이 나오면 다시 시도하지 않는다.
+- **한글 보안 모듈**: 스킬을 설치할 때 `suup.ps1 security --apply`로 등록한다(맨 위 안내). 등록돼 있지 않으면 한글이 파일을 열 때마다 '접근 허용' 확인 창을 띄우므로 `pdf`는 건너뛴다. 수업을 만드는 도중에는 스스로 등록하지 말고, 설치 단계가 빠졌다고 사용자에게 알린 뒤 원하면 실행한다. 상태는 `suup.ps1 security`로 본다.
 - 견본: `<SKILL>/examples/도덕-가치관/`, `<SKILL>/examples/과학-9과15-01-1차시/`. design.json을 쓰기 전에 하나를 읽고 형식을 따른다.
 
 ## 2. 만드는 순서
@@ -72,8 +86,8 @@ python <SKILL>/scripts/render_pdf.py    <차시폴더>/*.hwpx       # 한글로 
 
 ### ⑤ 점검과 확인
 1. `check_design.py`가 "문제 없음"을 낼 때까지 고친다.
-2. 두 파일을 만들고 `validate_hwpx.py`가 통과하는지 본다.
-3. 가능하면 `render_pdf.py`로 PDF를 만들어 읽어 본다. 확인할 것: 지도안이 1~2쪽인지, 문항과 답 칸이 같은 쪽에 있는지, 칸이 비거나 넘치지 않는지.
+2. 두 파일을 만들고 `validate`가 통과하는지 본다.
+3. 가능하면 `pdf`로 PDF를 만들어 읽어 본다. 확인할 것: 지도안이 1~2쪽인지, 문항과 답 칸이 같은 쪽에 있는지, 칸이 비거나 넘치지 않는지.
 4. 사용자에게 결과 파일 경로, 차시를 나눈 방식, 직접 확인할 것(단원명, 대상, 일시, 그림 자료)을 알린다.
 
 ## 3. design.json 형식
@@ -153,5 +167,5 @@ python <SKILL>/scripts/render_pdf.py    <차시폴더>/*.hwpx       # 한글로 
 
 - 지도안은 `templates/지도안 서식.hwpx`의 머리표를 그대로 쓰고, 과정표는 같은 열 너비와 테두리 번호로 새로 짠다. 서식 뒤쪽의 예시는 결과물에서 뺀다.
 - 활동지는 지도안 서식의 글꼴(함초롬바탕·돋움, HY헤드라인M)을 물려받고, 회색 칸과 점선 쓰기 줄 같은 모양을 덧붙인다.
-- 학교 서식으로 바꾸려면 `templates/`에 hwpx를 두고, `make_plan.py`의 칸 위치(`header_table`의 `fill`)와 열 너비(`COLS`)를 맞춘다.
+- 학교 서식으로 바꾸려면 `templates/`에 hwpx를 두고, 칸 위치(`make_plan.py`의 `header_table`의 `fill`, `suup.ps1`의 `Header-Table`)와 열 너비(`COLS`)를 두 벌 모두 맞춘다.
 - hwpx를 직접 고칠 때 XML은 문자열로 다룬다. ElementTree로 다시 쓰면 네임스페이스 접두사가 바뀌어 한글이 못 연다. 다른 hwpx 도구나 라이브러리를 설치하지 말고 이 스크립트를 쓴다.

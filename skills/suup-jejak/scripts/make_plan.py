@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from hwpxkit import CHAR, PARA, Package, cell, para, plain_text, table  # noqa: E402
+from hwpxkit import CHAR, PARA, Package, cell, esc, para, plain_text, table  # noqa: E402
 from check_design import check  # noqa: E402
 
 # 과정표 열 너비 (서식과 같음): 단계 | 활동명 | 교수·학습 활동 | 자료 및 유의점
@@ -141,7 +141,7 @@ def build(design_path, out=None):
     pkg = Package()
     title = d['meta'].get('doc_title', '수업 지도안')
     paras = [
-        pkg.first_para(f'<hp:run charPrIDRef="{CHAR["title"]}"><hp:t>{title}</hp:t></hp:run>'),
+        pkg.first_para(f'<hp:run charPrIDRef="{CHAR["title"]}"><hp:t>{esc(title)}</hp:t></hp:run>'),
         header_table(pkg, d),
         para('', PARA['body'], CHAR['body']),
         process_table(d),
