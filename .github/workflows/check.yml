@@ -79,9 +79,10 @@ jobs:
           foreach ($d in Get-ChildItem "$env:K\examples" -Directory) {
             $out = Join-Path $env:RUNNER_TEMP ('ps-' + $d.Name)
             powershell -NoProfile -ExecutionPolicy Bypass -File $tool check "$($d.FullName)\design.json"; if ($LASTEXITCODE) { exit 1 }
-            powershell -NoProfile -ExecutionPolicy Bypass -File $tool plan "$($d.FullName)\design.json" -o "$out\지도안.hwpx"; if ($LASTEXITCODE) { exit 1 }
-            powershell -NoProfile -ExecutionPolicy Bypass -File $tool sheet "$($d.FullName)\design.json" -o "$out\활동지.hwpx"; if ($LASTEXITCODE) { exit 1 }
-            powershell -NoProfile -ExecutionPolicy Bypass -File $tool validate "$out\지도안.hwpx" "$out\활동지.hwpx"; if ($LASTEXITCODE) { exit 1 }
+            # 이 단계 스크립트는 BOM 없이 저장되므로 여기에는 한글 글자를 쓰지 않음
+            powershell -NoProfile -ExecutionPolicy Bypass -File $tool plan "$($d.FullName)\design.json" -o "$out\plan.hwpx"; if ($LASTEXITCODE) { exit 1 }
+            powershell -NoProfile -ExecutionPolicy Bypass -File $tool sheet "$($d.FullName)\design.json" -o "$out\sheet.hwpx"; if ($LASTEXITCODE) { exit 1 }
+            powershell -NoProfile -ExecutionPolicy Bypass -File $tool validate "$out\plan.hwpx" "$out\sheet.hwpx"; if ($LASTEXITCODE) { exit 1 }
           }
       - uses: actions/setup-python@v5
         with:
@@ -99,8 +100,8 @@ jobs:
           bad = 0
           for d in glob.glob(os.environ['K'] + '/examples/*/'):
               name = os.path.basename(os.path.normpath(d))
-              for f in ('지도안.hwpx', '활동지.hwpx'):
-                  a = zipfile.ZipFile(os.path.join(d, f)); b = zipfile.ZipFile(os.path.join(os.environ['RUNNER_TEMP'], 'ps-' + name, f))
+              for f, g in (('지도안.hwpx', 'plan.hwpx'), ('활동지.hwpx', 'sheet.hwpx')):
+                  a = zipfile.ZipFile(os.path.join(d, f)); b = zipfile.ZipFile(os.path.join(os.environ['RUNNER_TEMP'], 'ps-' + name, g))
                   if b.infolist()[0].filename != 'mimetype' or b.infolist()[0].compress_type != 0:
                       print('mimetype 문제:', name, f); bad = 1
                   if a.namelist() != b.namelist():
