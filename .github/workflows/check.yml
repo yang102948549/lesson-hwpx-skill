@@ -113,8 +113,8 @@ jobs:
           PY
           bad=0
           for args in "get 9과15-01" "context 9과15-01" "context 9도01-01 4수01-01" "search 별 --school 중 --limit 5" "browse --school 중 --grades 1" "browse --school 고 --subject 과학" "get 없는코드"; do
-            powershell -NoProfile -ExecutionPolicy Bypass -File "$K/scripts/suup.ps1" standards $args > ps.txt 2>&1; a=$?
-            node "$K/scripts/standards.mjs" $args > nd.txt 2>&1; b=$?
+            powershell -NoProfile -ExecutionPolicy Bypass -File "$K/scripts/suup.ps1" standards $args > ps.txt 2>&1 && a=0 || a=$?
+            node "$K/scripts/standards.mjs" $args > nd.txt 2>&1 && b=0 || b=$?
             if diff -q --strip-trailing-cr ps.txt nd.txt > /dev/null && [ $a = $b ]; then echo "같음: $args"; else echo "다름: $args"; diff --strip-trailing-cr ps.txt nd.txt | head; bad=1; fi
           done
           exit $bad
