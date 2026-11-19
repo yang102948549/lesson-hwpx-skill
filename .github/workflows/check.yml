@@ -52,3 +52,13 @@ jobs:
                           print('다름:', name, f, n); bad = 1
           sys.exit(bad)
           PY
+      - name: 한글 보안 모듈 DLL이 원본과 같은지 확인
+        run: |
+          python - <<'PY'
+          import sys, os
+          sys.path.insert(0, os.environ['K'] + '/scripts')
+          import setup_hwp_security as s
+          ok = s.BUNDLED.is_file() and s.sha256(s.BUNDLED) == s.SHA256
+          print('DLL 확인:', 'OK' if ok else '다름')
+          sys.exit(0 if ok else 1)
+          PY

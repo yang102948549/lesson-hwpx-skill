@@ -28,7 +28,7 @@
 
 - **hwpx 만들기는 한글 프로그램 없이** Python 표준 기능만으로 합니다. 그래서 운영체제와 AI 환경에 관계없이 동작하고, 만들 때 한글의 허용 확인 창도 뜨지 않습니다.
 - **PDF 확인**은 AI가 결과를 눈으로 검토하는 선택 단계로, Windows와 한컴오피스가 있어야 합니다. 할 수 없는 환경에서는 건너뛰고 구조 점검 결과만 알려 줍니다. 이때는 한글에서 직접 열어 보세요.
-- PDF 확인을 하려면 한글 **보안 모듈**이 등록되어 있어야 합니다. 없으면 한글이 파일을 열 때마다 '접근 허용' 확인 창을 띄우기 때문에, 스킬은 이 단계를 건너뜁니다. 등록하려면 `pip install pyhwpx pywin32` 후 `python skills/suup-jejak/scripts/setup_hwp_security.py --apply`를 실행합니다. 등록하면 이 PC에서 한글 자동화를 쓰는 다른 프로그램도 확인 창 없이 파일을 열 수 있게 되므로, 필요할 때만 등록하세요. AI는 동의 없이 등록하지 않습니다.
+- PDF 확인을 하려면 한글 **보안 모듈**이 등록되어 있어야 합니다. 없으면 한글이 파일을 열 때마다 '접근 허용' 확인 창을 띄웁니다. 스킬에 보안 모듈(`bin/FilePathCheckerModule.dll`)이 들어 있어서, **Windows에서는 설치할 때 자동으로 등록됩니다**(아래 설치 방법). DLL은 `%LOCALAPPDATA%\HNC\Automation_Module`에 복사되고 `HKEY_CURRENT_USER\Software\HNC\HwpAutomation\Modules`에 등록되며, 관리자 권한은 필요 없습니다. 등록하면 이 PC에서 한글 자동화를 쓰는 다른 프로그램도 확인 창 없이 파일을 열 수 있습니다. 지우려면 `python <스킬 폴더>/scripts/setup_hwp_security.py --remove`를 실행합니다. PDF 저장에는 `pip install pywin32`도 필요합니다.
 - 결과 내용은 AI마다 다릅니다(차시 나누기, 활동 구성). 형식과 지도안·활동지 연결은 스크립트가 점검합니다.
 
 ## 설치하기: AI에게 요청하기
@@ -36,8 +36,10 @@
 AI 작업 창에 아래 문장을 붙여 넣으세요.
 
 ```text
-https://github.com/yang102948549/lesson-hwpx-skill 에 있는 skills/suup-jejak 스킬을 설치해 줘. 폴더 안의 서식, 데이터, 스크립트도 통째로 설치해 줘.
+https://github.com/yang102948549/lesson-hwpx-skill 에 있는 skills/suup-jejak 스킬을 설치해 줘. 폴더 안의 서식, 데이터, 스크립트, bin도 통째로 설치하고, 설치한 스킬의 SKILL.md 맨 위 안내대로 한글 보안 모듈 등록까지 해 줘.
 ```
+
+AI가 폴더를 복사한 뒤 `scripts/setup_hwp_security.py --apply`를 실행해 한글 보안 모듈을 등록합니다(Windows만).
 
 설치가 끝나면 새 세션을 열고 "suup-jejak 스킬이 설치됐는지 확인해 줘"라고 요청하세요.
 
@@ -52,7 +54,8 @@ https://github.com/yang102948549/lesson-hwpx-skill 에 있는 skills/suup-jejak 
    - Claude Code: `%USERPROFILE%\.claude\skills`
    - 한 작업 폴더에서만 쓰려면 그 폴더 안의 `.agents\skills` (Codex, Antigravity 공통)
 5. `suup-jejak` 폴더 안에 `SKILL.md`가 바로 보여야 합니다. **`SKILL.md`만 복사하지 말고 폴더를 통째로 복사하세요.** 서식, 데이터, 스크립트가 함께 있어야 동작합니다.
-6. AI 앱을 다시 시작하거나 새 세션을 엽니다. Antigravity CLI에서는 `/skills reload`로 다시 불러올 수 있습니다.
+6. (Windows) 한글 보안 모듈을 등록합니다. 붙여 넣은 `suup-jejak` 폴더에서 명령 창을 열고 `python scripts\setup_hwp_security.py --apply`를 실행합니다. "등록했습니다" 또는 "이미 등록됨"이 나오면 됩니다.
+7. AI 앱을 다시 시작하거나 새 세션을 엽니다. Antigravity CLI에서는 `/skills reload`로 다시 불러올 수 있습니다.
 
 ## 사용하기
 
@@ -77,8 +80,9 @@ skills/suup-jejak/
 │  ├─ check_design.py       지도안·활동지 연결과 시간 점검
 │  ├─ validate_hwpx.py      hwpx 구조 점검 (모든 운영체제)
 │  ├─ render_pdf.py         한글로 PDF 저장 (Windows + 한컴오피스)
-│  ├─ setup_hwp_security.py 한글 보안 모듈 등록 (PDF 확인용, 선택)
+│  ├─ setup_hwp_security.py 한글 보안 모듈 등록 (설치 때 실행)
 │  └─ hwpxkit.py            hwpx 조립 도구
+├─ bin/FilePathCheckerModule.dll 한글 자동화 보안 모듈
 ├─ templates/지도안 서식.hwpx
 ├─ data/curriculum.json     성취기준 원문 + 학습지도 자료
 └─ examples/                견본 두 차시

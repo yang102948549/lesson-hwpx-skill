@@ -32,16 +32,17 @@ def render(paths):
         fail('pywin32가 없습니다 (pip install pywin32).')
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from setup_hwp_security import registered
-    if not registered():
+    module = registered()
+    if not module:
         # 보안 모듈 없이 열면 숨은 창에 '접근 허용' 확인 창이 떠서 멈춥니다
-        fail('한글 보안 모듈이 등록되어 있지 않습니다. '
-             'PDF 확인이 필요하면 사용자에게 setup_hwp_security.py 설명 후 동의를 받아 --apply로 등록하세요.')
+        fail('한글 보안 모듈이 등록되어 있지 않습니다. 스킬 설치 단계(setup_hwp_security.py --apply)가 '
+             '빠진 것입니다. 사용자에게 알리고, 원하면 --apply로 등록하세요.')
     try:
         hwp = win32com.client.Dispatch('HWPFrame.HwpObject')
     except Exception as e:  # noqa: BLE001
         fail(f'한글 자동화를 시작할 수 없습니다. 한컴오피스가 없거나 샌드박스가 막았을 수 있습니다. ({e})')
     try:
-        hwp.RegisterModule('FilePathCheckDLL', 'FilePathCheckerModule')
+        hwp.RegisterModule('FilePathCheckDLL', module[0])
         hwp.XHwpWindows.Item(0).Visible = False
         for p in paths:
             src = Path(p).resolve()
