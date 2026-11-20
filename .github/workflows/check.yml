@@ -59,3 +59,69 @@ jobs:
           grep -q "연주시차" "$RUNNER_TEMP/활동지.md"
           npx -y kordoc@4 "$pdf" --pages 2 -o "$RUNNER_TEMP/2쪽.md"
           grep -q "스스로 점검" "$RUNNER_TEMP/2쪽.md"
+      - name: 한글 보안 모듈 DLL이 원본과 같은지 확인
+        run: |
+          python - <<'PY'
+          import sys, os
+          sys.path.insert(0, os.environ['K'] + '/scripts')
+          import setup_hwp_security as s
+          ok = s.BUNDLED.is_file() and s.sha256(s.BUNDLED) == s.SHA256
+          print('DLL 확인:', 'OK' if ok else '다름')
+          sys.exit(0 if ok else 1)
+          PY
+
+  powershell:
+    # Python·Node 없이 Windows 기본 PowerShell 5.1만으로 같은 결과가 나오는지
+    runs-on: windows-latest
+    env:
+      K: skills/suup-jejak
+    steps:
+      - uses: actions/checkout@v4
+      - name: 견본으로 지도안·활동지 만들고 구조 점검
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSVersionTable.PSVersion.ToString()
+          $tool = "$env:K\scripts\suup.ps1"
+          foreach ($d in Get-ChildItem "$env:K\examples" -Directory) {
+            $out = Join-Path $env:RUNNER_TEMP ('ps-' + $d.Name)
+            powershell -NoProfile -ExecutionPolicy Bypass -File $tool check "$($d.FullName)\design.json"; if ($LASTEXITCODE) { exit 1 }
+            # 이 단계 스크립트는 BOM 없이 저장되므로 여기에는 한글 글자를 쓰지 않음
+            powershell -NoProfile -ExecutionPolicy Bypass -File $tool plan "$($d.FullName)\design.json" -o "$out\plan.hwpx"; if ($LASTEXITCODE) { exit 1 }
+            powershell -NoProfile -ExecutionPolicy Bypass -File $tool sheet "$($d.FullName)\design.json" -o "$out\sheet.hwpx"; if ($LASTEXITCODE) { exit 1 }
+            powershell -NoProfile -ExecutionPolicy Bypass -File $tool validate "$out\plan.hwpx" "$out\sheet.hwpx"; if ($LASTEXITCODE) { exit 1 }
+          }
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 견본 파일과 같은지, 성취기준 찾기가 Node와 같은지 확인
+        shell: bash
+        env:
+          PYTHONIOENCODING: utf8
+        run: |
+          python - <<'PY'
+          import os, zipfile, glob, sys
+          bad = 0
+          for d in glob.glob(os.environ['K'] + '/examples/*/'):
+              name = os.path.basename(os.path.normpath(d))
+              for f, g in (('지도안.hwpx', 'plan.hwpx'), ('활동지.hwpx', 'sheet.hwpx')):
+                  a = zipfile.ZipFile(os.path.join(d, f)); b = zipfile.ZipFile(os.path.join(os.environ['RUNNER_TEMP'], 'ps-' + name, g))
+                  if b.infolist()[0].filename != 'mimetype' or b.infolist()[0].compress_type != 0:
+                      print('mimetype 문제:', name, f); bad = 1
+                  if a.namelist() != b.namelist():
+                      print('항목 다름:', name, f); bad = 1
+                  for n in a.namelist():
+                      if a.read(n) != b.read(n):
+                          print('다름:', name, f, n); bad = 1
+          sys.exit(bad)
+          PY
+          bad=0
+          for args in "get 9과15-01" "context 9과15-01" "context 9도01-01 4수01-01" "search 별 --school 중 --limit 5" "browse --school 중 --grades 1" "browse --school 고 --subject 과학" "get 없는코드"; do
+            powershell -NoProfile -ExecutionPolicy Bypass -File "$K/scripts/suup.ps1" standards $args > ps.txt 2>&1 && a=0 || a=$?
+            node "$K/scripts/standards.mjs" $args > nd.txt 2>&1 && b=0 || b=$?
+            if diff -q --strip-trailing-cr ps.txt nd.txt > /dev/null && [ $a = $b ]; then echo "같음: $args"; else echo "다름: $args"; diff --strip-trailing-cr ps.txt nd.txt | head; bad=1; fi
+          done
+          exit $bad

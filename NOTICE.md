@@ -17,5 +17,8 @@
 
 > MIT License — Copyright (c) 2026 chrisryugj
 
+## 한글 자동화 보안 모듈
+`skills/suup-jejak/bin/FilePathCheckerModule.dll`은 한글과컴퓨터가 한글 오토메이션용으로 배포하는 보안 승인 모듈입니다(pyhwpx 1.6.8에 들어 있는 것과 같은 파일). SHA-256: `9ac5b97c47ac8aed1e8bca27a3eef39411361d8f68c262509f0c40a8f9d21bb6`. `setup_hwp_security.py`는 이 값이 맞을 때만 등록합니다.
+
 ## 비보증
 이 자료는 공식 산출물이 아닙니다. 세부 주제와 평가 자료는 검토 전 초안이며, 수업과 평가에 쓰기 전에 교사가 공식 문서와 대조해야 합니다.
