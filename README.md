@@ -14,7 +14,7 @@
 
 - 스킬을 지원하는 AI 작업 환경: Codex, Antigravity, Claude Code 중 하나
 - Python 3.8 이상, Node.js 18 이상 (hwpx 만들기는 Python 표준 기능만 씁니다)
-- 교과서 파일을 읽으려면 Node.js 20 이상과 첫 실행 때 인터넷 연결 (kordoc을 `npx`로 내려받습니다)
+- 교과서 파일을 읽으려면 Node.js 20 이상과 첫 실행 때 인터넷 연결 (kordoc을 `npx`로 내려받습니다). 스킬을 설치해도 Node.js는 함께 설치되지 않습니다. Node가 없으면 AI 앱이 PDF를 직접 읽거나(Claude Code), 동의를 받아 Node.js를 설치합니다(Windows: `winget install OpenJS.NodeJS.LTS`).
 - 결과를 열어 볼 한글(한컴오피스) 또는 hwpx를 여는 프로그램
 
 ## 실행 환경별 지원
