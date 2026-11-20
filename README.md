@@ -6,6 +6,7 @@
 - 활동지는 지도안과 같은 글꼴로 만들며 질문, 점선 쓰기 칸, 표, 스스로 점검표가 들어갑니다.
 - 지도안과 활동지는 `design.json` 한 파일에서 함께 나오므로 활동 이름과 순서가 늘 맞습니다.
 - 성취기준 원문, 평가 증거, 흔한 오개념, 선수 학습 자료(초1~고3 4,451개)가 함께 들어 있습니다.
+- 교과서 PDF나 한글 파일을 주면 [kordoc](https://github.com/chrisryugj/kordoc)으로 필요한 쪽만 읽어 수업의 근거로 씁니다(`gyogwaseo-ilgi` 스킬).
 
 견본: [도덕 9도01-01](skills/suup-jejak/examples/도덕-가치관), [과학 9과15-01 1차시](skills/suup-jejak/examples/과학-9과15-01-1차시) (각 폴더에 hwpx와 PDF가 있습니다)
 
@@ -13,6 +14,7 @@
 
 - 스킬을 지원하는 AI 작업 환경: Codex, Antigravity, Claude Code 중 하나
 - Python 3.8 이상, Node.js 18 이상 (hwpx 만들기는 Python 표준 기능만 씁니다)
+- 교과서 파일을 읽으려면 Node.js 20 이상과 첫 실행 때 인터넷 연결 (kordoc을 `npx`로 내려받습니다)
 - 결과를 열어 볼 한글(한컴오피스) 또는 hwpx를 여는 프로그램
 
 ## 실행 환경별 지원
@@ -36,7 +38,7 @@
 AI 작업 창에 아래 문장을 붙여 넣으세요.
 
 ```text
-https://github.com/yang102948549/lesson-hwpx-skill 에 있는 skills/suup-jejak 스킬을 설치해 줘. 폴더 안의 서식, 데이터, 스크립트도 통째로 설치해 줘.
+https://github.com/yang102948549/lesson-hwpx-skill 에 있는 skills/suup-jejak 스킬과 skills/gyogwaseo-ilgi 스킬을 설치해 줘. 폴더 안의 서식, 데이터, 스크립트도 통째로 설치해 줘.
 ```
 
 설치가 끝나면 새 세션을 열고 "suup-jejak 스킬이 설치됐는지 확인해 줘"라고 요청하세요.
@@ -45,7 +47,7 @@ https://github.com/yang102948549/lesson-hwpx-skill 에 있는 skills/suup-jejak 
 
 1. 이 저장소 GitHub 페이지에서 초록색 **Code → Download ZIP**을 누릅니다.
 2. 내려받은 ZIP을 마우스 오른쪽 버튼으로 눌러 **압축 풀기**를 합니다.
-3. 압축을 푼 폴더에서 `skills` 폴더를 열고 `suup-jejak` 폴더를 복사합니다.
+3. 압축을 푼 폴더에서 `skills` 폴더를 열고 `suup-jejak` 폴더와 `gyogwaseo-ilgi` 폴더를 복사합니다. 교과서 파일을 쓰지 않으면 `suup-jejak`만 있어도 됩니다.
 4. 사용하는 환경에 맞는 폴더에 붙여 넣습니다. 폴더가 없으면 만듭니다.
    - Codex: `%USERPROFILE%\.agents\skills`
    - Antigravity: `%USERPROFILE%\.gemini\config\skills`
@@ -62,6 +64,7 @@ https://github.com/yang102948549/lesson-hwpx-skill 에 있는 skills/suup-jejak 
 
 - 성취기준이 한 차시에 크면 AI가 몇 차시로 나눌지 정하고 어느 차시를 만들었는지 알려 줍니다.
 - 결과는 작업 폴더에 차시별 폴더(`design.json`, `지도안.hwpx`, `활동지.hwpx`)로 저장됩니다.
+- 교과서를 근거로 하려면 파일을 함께 주세요: `이 교과서 PDF 34~41쪽으로 9과15-01 한 차시 만들어 줘.` 쪽을 말하지 않으면 AI가 목차에서 찾아 알려 줍니다. 쓴 쪽수는 지도안 설계 메모(`plan_note`)에 남습니다.
 - 고치고 싶으면 "활동 2를 모둠 토의로 바꿔 줘"처럼 요청하면 `design.json`을 고쳐 다시 만듭니다.
 - **단원명, 수업 대상, 일시, 그림 자료는 직접 확인하세요.** 교과서마다 단원명이 다릅니다.
 
@@ -82,6 +85,8 @@ skills/suup-jejak/
 ├─ templates/지도안 서식.hwpx
 ├─ data/curriculum.json     성취기준 원문 + 학습지도 자료
 └─ examples/                견본 두 차시
+skills/gyogwaseo-ilgi/
+└─ SKILL.md                 교과서·자료 파일을 kordoc으로 읽는 순서
 tools/build-data.mjs        data/curriculum.json 다시 만들기 (개발용)
 sources/curriculum-data.js  성취기준 원문 (개발용)
 ```
@@ -90,4 +95,4 @@ sources/curriculum-data.js  성취기준 원문 (개발용)
 
 ## 자료 출처와 비보증
 
-성취기준 원문은 교육부·국가교육위원회 고시(저작권법 제7조 비보호 대상)이고, 세부 주제·평가 자료·학습 관계는 [DECK6/korean-secondary-learning-map](https://github.com/DECK6/korean-secondary-learning-map)(MIT)을 가공했습니다. 자세한 내용은 [NOTICE.md](NOTICE.md)를 보세요. 평가 자료는 검토 전 초안이므로 수업과 평가에 쓰기 전에 공식 문서와 대조해야 합니다. 이 스킬이 만든 지도안과 활동지도 교사가 검토한 뒤 사용하세요.
+성취기준 원문은 교육부·국가교육위원회 고시(저작권법 제7조 비보호 대상)이고, 세부 주제·평가 자료·학습 관계는 [DECK6/korean-secondary-learning-map](https://github.com/DECK6/korean-secondary-learning-map)(MIT)을 가공했습니다. 교과서 읽기는 [chrisryugj/kordoc](https://github.com/chrisryugj/kordoc)(MIT)을 실행할 때 내려받아 씁니다(이 저장소에 코드를 넣지 않음). 자세한 내용은 [NOTICE.md](NOTICE.md)를 보세요. 교과서는 저작물이므로 결과물에 긴 본문을 옮기지 않게 했습니다. 평가 자료는 검토 전 초안이므로 수업과 평가에 쓰기 전에 공식 문서와 대조해야 합니다. 이 스킬이 만든 지도안과 활동지도 교사가 검토한 뒤 사용하세요.

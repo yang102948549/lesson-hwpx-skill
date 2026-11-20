@@ -52,3 +52,10 @@ jobs:
                           print('다름:', name, f, n); bad = 1
           sys.exit(bad)
           PY
+      - name: kordoc으로 견본 PDF 읽기
+        run: |
+          pdf="$K/examples/과학-9과15-01-1차시/활동지.pdf"
+          npx -y kordoc@4 "$pdf" -o "$RUNNER_TEMP/활동지.md"
+          grep -q "연주시차" "$RUNNER_TEMP/활동지.md"
+          npx -y kordoc@4 "$pdf" --pages 2 -o "$RUNNER_TEMP/2쪽.md"
+          grep -q "스스로 점검" "$RUNNER_TEMP/2쪽.md"
