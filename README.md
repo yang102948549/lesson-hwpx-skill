@@ -15,7 +15,7 @@
 - 스킬을 지원하는 AI 작업 환경: Claude Code(데스크톱 앱 포함), Codex, Antigravity 중 하나
 - 결과를 열어 볼 한글(한컴오피스) 또는 hwpx를 여는 프로그램
 - **Windows에서는 따로 설치할 것이 없습니다.** Python이나 Node.js가 없어도 됩니다.
-- 교과서 파일(PDF, HWP)을 읽을 때만 Node.js 20 이상과 첫 실행 때 인터넷 연결이 필요합니다(kordoc을 `npx`로 내려받음). 스킬을 설치해도 Node.js는 함께 설치되지 않습니다. Node가 없으면 AI 앱이 PDF를 직접 읽거나(Claude Code), 동의를 받아 Node.js를 설치합니다(Windows: `winget install OpenJS.NodeJS.LTS`).
+- 교과서 파일(PDF, HWP)을 읽을 때만 Node.js 20 이상과 첫 실행 때 인터넷 연결이 필요합니다(kordoc을 `npx`로 내려받음). 스킬을 설치해도 Node.js는 함께 설치되지 않습니다. Node가 없으면 kordoc 없이 AI가 PDF를 직접 읽고 분석합니다(따로 설치할 것 없음). 이때 표와 수식은 덜 정확할 수 있고, HWP 파일은 한글에서 PDF로 저장해 주어야 합니다.
 
 ## 어떻게 동작하나
 
